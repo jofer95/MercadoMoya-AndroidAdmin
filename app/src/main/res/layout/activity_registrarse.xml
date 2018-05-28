@@ -83,13 +83,13 @@
                     app:srcCompat="@mipmap/ic_launcher_round" />
 
                 <EditText
-                    android:id="@+id/edtTelefono"
+                    android:id="@+id/edtDireccion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Telefono"
+                    android:hint="Direccion"
                     android:inputType="textPersonName" />
             </LinearLayout>
             <LinearLayout

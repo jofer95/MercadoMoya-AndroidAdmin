@@ -21,7 +21,8 @@
             android:label="@string/title_activity_menu_principal"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Activities.RegistrarseActivity" />
-        <activity android:name=".Activities.AltaDeArticuloActivity"></activity>
+        <activity android:name=".Activities.AltaDeArticuloActivity" />
+        <activity android:name=".Activities.AltaDeCategoria"></activity>
     </application>
 
 </manifest>
