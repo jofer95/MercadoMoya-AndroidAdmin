@@ -34,27 +34,20 @@
                 android:inputType="textPersonName" />
 
             <EditText
-                android:id="@+id/edtDescripcion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Descripcion"
-                android:inputType="textPersonName" />
-
-            <EditText
                 android:id="@+id/edtImagen"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Imagen URL"
                 android:inputType="textPersonName" />
+
             <Button
                 android:id="@+id/btnGuardarArticulo"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_marginTop="30dp"
                 android:background="@drawable/btn_redondo_verde"
-                android:text="Guardar articulo"
+                android:text="Guardar categoria"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp" />
 
