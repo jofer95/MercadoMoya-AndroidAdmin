@@ -2,18 +2,19 @@ package com.example.jorgebarraza.mercadomoya.Modelos;
 
 public class Usuario {
 
-    private String id;
+    private String usuarioID;
     private String nombre;
     private String correo;
     private String direccion;
     private String contrasena;
+    private int rol;
 
-    public String getId() {
-        return id;
+    public String getUsuarioID() {
+        return usuarioID;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUsuarioID(String usuarioID) {
+        this.usuarioID = usuarioID;
     }
 
     public String getNombre() {
@@ -46,5 +47,13 @@ public class Usuario {
 
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
+    }
+
+    public int getRol() {
+        return rol;
+    }
+
+    public void setRol(int rol) {
+        this.rol = rol;
     }
 }

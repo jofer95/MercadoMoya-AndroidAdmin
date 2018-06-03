@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -33,10 +34,12 @@ import com.android.volley.toolbox.Volley;
 import com.example.jorgebarraza.mercadomoya.Adapters.ArticulosAdapter;
 import com.example.jorgebarraza.mercadomoya.Adapters.CategoriasAdapter;
 import com.example.jorgebarraza.mercadomoya.Adapters.PedidosAdapter;
+import com.example.jorgebarraza.mercadomoya.Adapters.UsuariosAdapter;
 import com.example.jorgebarraza.mercadomoya.DB.Servicios;
 import com.example.jorgebarraza.mercadomoya.Fragments.articulosFragment;
 import com.example.jorgebarraza.mercadomoya.Modelos.Articulo;
 import com.example.jorgebarraza.mercadomoya.Modelos.Categoria;
+import com.example.jorgebarraza.mercadomoya.Modelos.Usuario;
 import com.example.jorgebarraza.mercadomoya.R;
 import com.example.jorgebarraza.mercadomoya.Utils.Utilerias;
 import com.google.gson.Gson;
@@ -59,9 +62,11 @@ public class MenuPrincipalActivity extends AppCompatActivity
     private SearchView searchView;
     private ArticulosAdapter articulosAdapter;
     private CategoriasAdapter categoriasAdapter;
+    private UsuariosAdapter usuariosAdapter;
     private PedidosAdapter pedidosAdapter;
     private ProgressDialog progressDialog;
     private Context context;
+    private TextView tvUsuario,tvNombre;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +93,17 @@ public class MenuPrincipalActivity extends AppCompatActivity
                         Intent intent2 = new Intent(context, AltaDeCategoria.class);
                         startActivity(intent2);
                         break;
-                    default:
-                        Intent intent3 = new Intent(context, AltaDeArticuloActivity.class);
+                    case "pedidos":
+                        Intent intent3 = new Intent(context, AltaDeCategoria.class);
                         startActivity(intent3);
+                        break;
+                    case "usuarios":
+                        Intent intent4 = new Intent(context, RegistrarseActivity.class);
+                        startActivity(intent4);
+                        break;
+                    default:
+                        Intent intent5 = new Intent(context, AltaDeArticuloActivity.class);
+                        startActivity(intent5);
                         break;
                 }
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -106,6 +119,11 @@ public class MenuPrincipalActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        TextView navUsuario = (TextView) headerView.findViewById(R.id.tvUsuario);
+        TextView navNombre = (TextView) headerView.findViewById(R.id.tvNombre);
+        navUsuario.setText(Utilerias.getPreference(context,"usuario"));
+        navNombre.setText(Utilerias.getPreference(context,"nombre"));
 
     }
 
@@ -119,6 +137,12 @@ public class MenuPrincipalActivity extends AppCompatActivity
                 break;
             case "categorias":
                 consultarCategorias();
+                break;
+            case "pedidos":
+                consultarCategorias();
+                break;
+            case "usuarios":
+                consultarUsuarios();
                 break;
             default:
                 consultarArticulos();
@@ -166,20 +190,31 @@ public class MenuPrincipalActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             Utilerias.savePreference(context, "opcion", "articulos");
+            setTitle("Articulos");
             consultarArticulos();
 
         } else if (id == R.id.nav_gallery) {
             Utilerias.savePreference(context, "opcion", "categorias");
+            setTitle("Categorias");
             consultarCategorias();
 
         } else if (id == R.id.nav_slideshow) {
             Utilerias.savePreference(context, "opcion", "pedidos");
+            setTitle("Pedidos");
 
         } else if (id == R.id.nav_manage) {
+            Utilerias.savePreference(context, "opcion", "usuarios");
+            setTitle("Usuarios");
+            consultarUsuarios();
 
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
+            Utilerias.savePreference(context,"usuario","");
+            Utilerias.savePreference(context,"usuarioID","");
+            Utilerias.savePreference(context,"nombre","");
+            Intent intent = new Intent(context,MainActivity.class);
+            startActivity(intent);
             finish();
 
         }
@@ -216,6 +251,9 @@ public class MenuPrincipalActivity extends AppCompatActivity
                                 progressDialog = null;
                             } else {
                                 Toast.makeText(context, "Articulos no disponibles", Toast.LENGTH_LONG).show();
+                                ArrayList<Articulo> listaVacia = new ArrayList<>();
+                                articulosAdapter = new ArticulosAdapter(listaVacia);
+                                recyclerView.setAdapter(articulosAdapter);
                                 progressDialog.dismiss();
                                 progressDialog = null;
                             }
@@ -274,6 +312,70 @@ public class MenuPrincipalActivity extends AppCompatActivity
                                 progressDialog = null;
                             } else {
                                 Toast.makeText(context, "Categorias no disponibles", Toast.LENGTH_LONG).show();
+                                ArrayList<Categoria> listaVacia = new ArrayList<>();
+                                categoriasAdapter = new CategoriasAdapter(listaVacia);
+                                recyclerView.setAdapter(categoriasAdapter);
+                                progressDialog.dismiss();
+                                progressDialog = null;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(context, "Ocurrio un error al procesar los datos", Toast.LENGTH_LONG).show();
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                //params.put("name", "Alif");
+                //params.put("domain", "http://itsalif.info");
+
+                return params;
+            }
+        };
+        queue.add(postRequest);
+    }
+
+    private void consultarUsuarios() {
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("Obteniendo usuarios...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = Servicios.obtenerTodosLosUsuarios();
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+                            if (jsonArray.length() > 0) {
+                                ArrayList<Usuario> list = new ArrayList<Usuario>();
+                                Gson gson = new GsonBuilder().create();
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    Usuario obj = gson.fromJson(String.valueOf(jsonArray.getJSONObject(i)), Usuario.class);
+                                    list.add(obj);
+                                    //baseDeDatos.insertOrReplaceAlumnos(alumno);
+                                }
+                                usuariosAdapter = new UsuariosAdapter(list);
+                                recyclerView.setAdapter(usuariosAdapter);
+                                progressDialog.dismiss();
+                                progressDialog = null;
+                            } else {
+                                Toast.makeText(context, "Usuarios no disponibles", Toast.LENGTH_LONG).show();
+                                ArrayList<Usuario> listaVacia = new ArrayList<>();
+                                usuariosAdapter = new UsuariosAdapter(listaVacia);
+                                recyclerView.setAdapter(usuariosAdapter);
                                 progressDialog.dismiss();
                                 progressDialog = null;
                             }

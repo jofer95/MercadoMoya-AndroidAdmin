@@ -89,7 +89,7 @@ public class ArticulosAdapter extends RecyclerView.Adapter<ArticulosAdapter.View
         public void asignarArticulos(Articulo articulo) {
             nombre.setText(articulo.getNombre());
             precio.setText(articulo.getPrecio().toString());
-            //asignarFoto(Servicios.obtenerFotografia(articulo.getNcontrol()));
+            asignarFoto(articulo.getImagenURL());
         }
 
         private void asignarFoto(String foto_url) {

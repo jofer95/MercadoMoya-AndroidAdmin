@@ -30,4 +30,21 @@ public class Servicios {
     public static String crearActualizarCategoria(){
         return baseURL + "Categorias/CrearActualizarCategoria";
     }
+
+    //Usuarios:
+    public static String obtenerTodosLosUsuarios(){
+        return baseURL + "Usuarios/ObtenerTodosLosUsuarios";
+    }
+
+    public static String obtenerUsuarioPorID(){
+        return baseURL + "Usuarios/ObtenerUsuarioPorID";
+    }
+
+    public static String obtenerUsuarioPorCorreo(){
+        return baseURL + "Usuarios/ObtenerUsuarioPorCorreo";
+    }
+
+    public static String crearActualizarUsuario(){
+        return baseURL + "Usuarios/CrearActualizarUsuario";
+    }
 }

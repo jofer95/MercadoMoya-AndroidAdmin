@@ -46,13 +46,14 @@
                     android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Usuario"
+                    android:hint="Usuario o correo"
                     android:inputType="textPersonName" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -95,7 +96,7 @@
 
             <Button
                 android:id="@+id/btnRegistrarse"
-
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_marginTop="30dp"

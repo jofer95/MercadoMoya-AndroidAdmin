@@ -3,6 +3,7 @@ package com.example.jorgebarraza.mercadomoya.Activities;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,6 +21,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -55,6 +58,8 @@ public class AltaDeArticuloActivity extends AppCompatActivity {
     private EditText editImagenURL;
     private Spinner spnCategorias;
     private Button btnGuardar;
+    private ImageView image;
+    private RequestQueue request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,7 @@ public class AltaDeArticuloActivity extends AppCompatActivity {
         spnCategorias = findViewById(R.id.spnCategoria);
         btnGuardar = findViewById(R.id.btnGuardarArticulo);
         editNombre = findViewById(R.id.edtNombre);
+        image = findViewById(R.id.imgImagenProducto);
         setTitle("Alta de articulo");
         Intent intent = getIntent();
         articuloID = intent.getStringExtra("articuloID");
@@ -93,6 +99,17 @@ public class AltaDeArticuloActivity extends AppCompatActivity {
                 }
             }
         });
+
+        editImagenURL.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if(!hasFocus){
+                    asignarFoto(editImagenURL.getText().toString());
+                }
+            }
+        });
     }
 
     private void obtenerArticuloPorID() {
@@ -117,6 +134,7 @@ public class AltaDeArticuloActivity extends AppCompatActivity {
                         editDescripcion.setText(arti.getDescripcion());
                         editPrecio.setText(arti.getPrecio().toString());
                         editImagenURL.setText(arti.getImagenURL());
+                        asignarFoto(arti.getImagenURL());
                         if(progressDialog != null){
                             progressDialog.dismiss();
                             progressDialog = null;
@@ -292,5 +310,21 @@ public class AltaDeArticuloActivity extends AppCompatActivity {
             }
         };
         queue.add(postRequest);
+    }
+
+    private void asignarFoto(String foto_url) {
+        request = Volley.newRequestQueue(context);
+        ImageRequest imageRequest = new ImageRequest(foto_url, new Response.Listener<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap response) {
+                image.setImageBitmap(response);
+            }
+        }, 0, 0, ImageView.ScaleType.CENTER, null, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(contexto, "Error al obtener fotografia", Toast.LENGTH_SHORT).show();
+            }
+        });
+        request.add(imageRequest);
     }
 }
