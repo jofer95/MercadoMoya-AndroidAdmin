@@ -2,19 +2,27 @@ package com.example.jorgebarraza.mercadomoya.Modelos;
 
 public class Articulo {
 
-    private String id;
+    private String articuloID;
     private String nombre;
     private Double precio;
     private String descripcion;
-    private int categoriaId;
-    private String imagenUrl;
+    private String categoria;
+    private String imagenURL;
 
-    public String getId() {
-        return id;
+    public String getArticuloID() {
+        return articuloID;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setArticuloID(String articuloID) {
+        this.articuloID = articuloID;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public Double getPrecio() {
@@ -33,27 +41,19 @@ public class Articulo {
         this.descripcion = descripcion;
     }
 
-    public int getCategoriaId() {
-        return categoriaId;
+    public String getCategoria() {
+        return categoria;
     }
 
-    public void setCategoriaId(int categoriaId) {
-        this.categoriaId = categoriaId;
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
-    public String getImagenUrl() {
-        return imagenUrl;
+    public String getImagenURL() {
+        return imagenURL;
     }
 
-    public void setImagenUrl(String imagenUrl) {
-        this.imagenUrl = imagenUrl;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setImagenURL(String imagenURL) {
+        this.imagenURL = imagenURL;
     }
 }

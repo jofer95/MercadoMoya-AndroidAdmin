@@ -1,6 +1,7 @@
 package com.example.jorgebarraza.mercadomoya.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.jorgebarraza.mercadomoya.Activities.AltaDeArticuloActivity;
 import com.example.jorgebarraza.mercadomoya.Modelos.Articulo;
 import com.example.jorgebarraza.mercadomoya.R;
 
@@ -31,7 +33,7 @@ public class ArticulosAdapter extends RecyclerView.Adapter<ArticulosAdapter.View
     @Override
     public ViewHolderArticulos onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_articulo, null);
-        return new ViewHolderArticulos(view);
+        return new ArticulosAdapter.ViewHolderArticulos(view);
     }
 
     @Override
@@ -63,6 +65,9 @@ public class ArticulosAdapter extends RecyclerView.Adapter<ArticulosAdapter.View
                 @Override
                 public void onClick(View view) {
                     int itemPosition = getLayoutPosition();
+                    Intent intent = new Intent(contexto, AltaDeArticuloActivity.class);
+                    intent.putExtra("articuloID", listaArticulos.get(itemPosition).getArticuloID());
+                    contexto.startActivity(intent);
                     /*if(MainActivity.asistenciaPorAlumno){
                         Intent intent = new Intent(contexto, AlumnoDetalle.class);
                         intent.putExtra("nombre", listaArticulos.get(itemPosition).nombreCompleto());
