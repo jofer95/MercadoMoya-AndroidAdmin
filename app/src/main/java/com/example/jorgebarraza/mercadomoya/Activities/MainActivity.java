@@ -113,9 +113,11 @@ public class MainActivity extends AppCompatActivity {
                                     progressDialog = null;
                                 }
                             }else{
-                                Utilerias.savePreference(context,"usuario",obj.getCorreo());
-                                Utilerias.savePreference(context,"usuarioID",obj.getUsuarioID());
-                                Utilerias.savePreference(context,"nombre",obj.getNombre());
+                                if(checkRecordar.isChecked()){
+                                    Utilerias.savePreference(context,"usuario",obj.getCorreo());
+                                    Utilerias.savePreference(context,"usuarioID",obj.getUsuarioID());
+                                    Utilerias.savePreference(context,"nombre",obj.getNombre());
+                                }
                                 Intent intent = new Intent(context,MenuPrincipalActivity.class);
                                 startActivity(intent);
                                 if(progressDialog != null){
