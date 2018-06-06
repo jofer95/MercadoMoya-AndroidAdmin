@@ -47,4 +47,29 @@ public class Servicios {
     public static String crearActualizarUsuario(){
         return baseURL + "Usuarios/CrearActualizarUsuario";
     }
+
+    //Pedidos:
+    public static String obtenerTodosLosPedidos(){
+        return baseURL + "Pedidos/ObtenerTodosLosPedidos";
+    }
+
+    public static String obtenerPedidoPorID(){
+        return baseURL + "Pedidos/ObtenerPedidoPorID";
+    }
+
+    public static String obtenerPedidoPorUsuario(){
+        return baseURL + "Pedidos/ObtenerPedidoPorUsuario";
+    }
+
+    public static String obtenerUsuarioPorIDTemp(){
+        return baseURL + "Pedidos/ObtenerPedidoPorIDTemp";
+    }
+
+    public static String crearActualizarPedido(){
+        return baseURL + "Pedidos/CrearActualizarPedido";
+    }
+
+    public static String borrarPedidoPorID(){
+        return baseURL + "Pedidos/BorrarPedido";
+    }
 }

@@ -39,6 +39,7 @@ import com.example.jorgebarraza.mercadomoya.DB.Servicios;
 import com.example.jorgebarraza.mercadomoya.Fragments.articulosFragment;
 import com.example.jorgebarraza.mercadomoya.Modelos.Articulo;
 import com.example.jorgebarraza.mercadomoya.Modelos.Categoria;
+import com.example.jorgebarraza.mercadomoya.Modelos.Pedido;
 import com.example.jorgebarraza.mercadomoya.Modelos.Usuario;
 import com.example.jorgebarraza.mercadomoya.R;
 import com.example.jorgebarraza.mercadomoya.Utils.Utilerias;
@@ -94,8 +95,8 @@ public class MenuPrincipalActivity extends AppCompatActivity
                         startActivity(intent2);
                         break;
                     case "pedidos":
-                        Intent intent3 = new Intent(context, AltaDeCategoria.class);
-                        startActivity(intent3);
+                        /*Intent intent3 = new Intent(context, AltaDeCategoria.class);
+                        startActivity(intent3);*/
                         break;
                     case "usuarios":
                         Intent intent4 = new Intent(context, RegistrarseActivity.class);
@@ -139,7 +140,7 @@ public class MenuPrincipalActivity extends AppCompatActivity
                 consultarCategorias();
                 break;
             case "pedidos":
-                consultarCategorias();
+                consultarPedidos();
                 break;
             case "usuarios":
                 consultarUsuarios();
@@ -201,13 +202,14 @@ public class MenuPrincipalActivity extends AppCompatActivity
         } else if (id == R.id.nav_slideshow) {
             Utilerias.savePreference(context, "opcion", "pedidos");
             setTitle("Pedidos");
+            consultarPedidos();
 
         } else if (id == R.id.nav_manage) {
             Utilerias.savePreference(context, "opcion", "usuarios");
             setTitle("Usuarios");
             consultarUsuarios();
 
-        } else if (id == R.id.nav_share) {
+        /*} else if (id == R.id.nav_share) {*/
 
         } else if (id == R.id.nav_send) {
             Utilerias.savePreference(context,"usuario","");
@@ -376,6 +378,67 @@ public class MenuPrincipalActivity extends AppCompatActivity
                                 ArrayList<Usuario> listaVacia = new ArrayList<>();
                                 usuariosAdapter = new UsuariosAdapter(listaVacia);
                                 recyclerView.setAdapter(usuariosAdapter);
+                                progressDialog.dismiss();
+                                progressDialog = null;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(context, "Ocurrio un error al procesar los datos", Toast.LENGTH_LONG).show();
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                //params.put("name", "Alif");
+                //params.put("domain", "http://itsalif.info");
+
+                return params;
+            }
+        };
+        queue.add(postRequest);
+    }
+
+    private void consultarPedidos() {
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("Obteniendo pedidos...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = Servicios.obtenerTodosLosPedidos();
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+                            if (jsonArray.length() > 0) {
+                                ArrayList<Pedido> list = new ArrayList<Pedido>();
+                                Gson gson = new GsonBuilder().create();
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    Pedido obj = gson.fromJson(String.valueOf(jsonArray.getJSONObject(i)), Pedido.class);
+                                    list.add(obj);
+                                    //baseDeDatos.insertOrReplaceAlumnos(alumno);
+                                }
+                                pedidosAdapter = new PedidosAdapter(list);
+                                recyclerView.setAdapter(pedidosAdapter);
+                                progressDialog.dismiss();
+                                progressDialog = null;
+                            } else {
+                                Toast.makeText(context, "Pedidos no disponibles", Toast.LENGTH_LONG).show();
+                                ArrayList<Pedido> listaVacia = new ArrayList<>();
+                                pedidosAdapter = new PedidosAdapter(listaVacia);
+                                recyclerView.setAdapter(pedidosAdapter);
                                 progressDialog.dismiss();
                                 progressDialog = null;
                             }

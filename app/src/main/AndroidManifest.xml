@@ -2,13 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.jorgebarraza.mercadomoya">
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-
-
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/mercado_moya"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -26,7 +24,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".Activities.RegistrarseActivity" />
         <activity android:name=".Activities.AltaDeArticuloActivity" />
-        <activity android:name=".Activities.AltaDeCategoria"></activity>
+        <activity android:name=".Activities.AltaDeCategoria" />
+        <activity android:name=".Activities.DetallesPedidoActv"></activity>
     </application>
 
 </manifest>

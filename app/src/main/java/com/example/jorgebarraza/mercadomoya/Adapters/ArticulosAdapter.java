@@ -68,20 +68,6 @@ public class ArticulosAdapter extends RecyclerView.Adapter<ArticulosAdapter.View
                     Intent intent = new Intent(contexto, AltaDeArticuloActivity.class);
                     intent.putExtra("articuloID", listaArticulos.get(itemPosition).getArticuloID());
                     contexto.startActivity(intent);
-                    /*if(MainActivity.asistenciaPorAlumno){
-                        Intent intent = new Intent(contexto, AlumnoDetalle.class);
-                        intent.putExtra("nombre", listaArticulos.get(itemPosition).nombreCompleto());
-                        intent.putExtra("numeroControl", listaArticulos.get(itemPosition).getNcontrol());
-                        contexto.startActivity(intent);
-                    }else{
-                        if(listaArticulos.get(itemPosition).getEstatus() == 1){
-                            estatus.setBackgroundColor(Color.RED);
-                            listaArticulos.get(itemPosition).setEstatus(2);
-                        }else{
-                            estatus.setBackgroundColor(Color.GREEN);
-                            listaArticulos.get(itemPosition).setEstatus(1);
-                        }
-                    }*/
                 }
             });
         }

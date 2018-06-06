@@ -3,7 +3,6 @@ package com.example.jorgebarraza.mercadomoya.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,30 +16,30 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.jorgebarraza.mercadomoya.Activities.AltaDeArticuloActivity;
-import com.example.jorgebarraza.mercadomoya.Activities.DetallesPedidoActv;
 import com.example.jorgebarraza.mercadomoya.Modelos.Articulo;
-import com.example.jorgebarraza.mercadomoya.Modelos.Pedido;
+import com.example.jorgebarraza.mercadomoya.Modelos.ArticuloPedido;
 import com.example.jorgebarraza.mercadomoya.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHolderArticulos> {
-    private ArrayList<Pedido> listaArticulos;
+public class ArticulosPedidoAdapter extends RecyclerView.Adapter<ArticulosPedidoAdapter.ViewHolderArticulos> {
+    private List<ArticuloPedido> listaArticulos;
     private RequestQueue request;
 
-    public PedidosAdapter(ArrayList<Pedido> listaDatos) {
+    public ArticulosPedidoAdapter(List<ArticuloPedido> listaDatos) {
         this.listaArticulos = listaDatos;
         setHasStableIds(true);
     }
 
     @Override
-    public PedidosAdapter.ViewHolderArticulos onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pedido, null);
-        return new PedidosAdapter.ViewHolderArticulos(view);
+    public ViewHolderArticulos onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_articulo, null);
+        return new ArticulosPedidoAdapter.ViewHolderArticulos(view);
     }
 
     @Override
-    public void onBindViewHolder(PedidosAdapter.ViewHolderArticulos holder, int position) {
+    public void onBindViewHolder(ViewHolderArticulos holder, int position) {
         holder.asignarArticulos(listaArticulos.get(position));
     }
 
@@ -50,16 +49,15 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
     }
 
     public class ViewHolderArticulos extends RecyclerView.ViewHolder {
-        TextView nombre, pagado,total;
+        TextView nombre, precio;
         ImageView foto;
         View estatus;
         Context contexto;
 
         public ViewHolderArticulos(View itemView) {
             super(itemView);
-            nombre = (TextView) itemView.findViewById(R.id.tvUsuario);
-            pagado = (TextView) itemView.findViewById(R.id.tvPagado);
-            total = (TextView) itemView.findViewById(R.id.tvTotalPedido);
+            nombre = (TextView) itemView.findViewById(R.id.tvArticulo);
+            precio = (TextView) itemView.findViewById(R.id.tvPrecio);
             foto = (ImageView) itemView.findViewById(R.id.idFoto);
             estatus = (View) itemView.findViewById(R.id.idEstatus);
             contexto = itemView.getContext();
@@ -69,28 +67,17 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
                 @Override
                 public void onClick(View view) {
                     int itemPosition = getLayoutPosition();
-                    Intent intent = new Intent(contexto, DetallesPedidoActv.class);
-                    intent.putExtra("pedidoID", listaArticulos.get(itemPosition).getPedidoID());
-                    contexto.startActivity(intent);
+                    /*Intent intent = new Intent(contexto, AltaDeArticuloActivity.class);
+                    intent.putExtra("articuloID", listaArticulos.get(itemPosition).getArticuloID());
+                    contexto.startActivity(intent);*/
                 }
             });
         }
 
-        public void asignarArticulos(Pedido articulo) {
-            if(articulo.getUsuario().equals("")){
-                nombre.setText("Usuario no registrado");
-            }else{
-                nombre.setText(articulo.getUsuario());
-            }
-            if(articulo.getPagado()){
-                pagado.setText("Pagado");
-                estatus.setBackgroundColor(Color.GREEN);
-            }else{
-                pagado.setText("No pagado");
-                estatus.setBackgroundColor(Color.RED);
-            }
-            total.setText("$"+articulo.getTotal().toString());
-            asignarFoto("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRloKf8JSFe9QOuGoJp2A97RFoRxnvABK0lpNtE8LPPYk8MPJcm");
+        public void asignarArticulos(ArticuloPedido articulo) {
+            nombre.setText(articulo.getNombre());
+            precio.setText(articulo.getPrecio().toString());
+            asignarFoto(articulo.getImagenURL());
         }
 
         private void asignarFoto(String foto_url) {
