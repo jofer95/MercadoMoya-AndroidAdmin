@@ -5,20 +5,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".Activities.MenuPrincipalActivity"
-    tools:showIn="@layout/app_bar_menu_principal"
-    >
+    tools:context=".Activities.DetallesPedidoActv">
 
-    <SearchView
-        android:id="@+id/searchItems"
+    <Button
+        android:id="@+id/btnBorrarPedido"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Borrar pedido" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Articulos del pedido:"
+        android:textSize="24sp" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/lstMain"
+        android:id="@+id/recyclerPedido"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 </LinearLayout>

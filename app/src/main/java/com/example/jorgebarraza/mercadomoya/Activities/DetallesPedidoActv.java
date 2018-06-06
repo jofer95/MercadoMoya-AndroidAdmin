@@ -5,11 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -19,9 +18,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.jorgebarraza.mercadomoya.Adapters.ArticulosAdapter;
+import com.example.jorgebarraza.mercadomoya.Adapters.ArticulosPedidoAdapter;
 import com.example.jorgebarraza.mercadomoya.DB.Servicios;
-import com.example.jorgebarraza.mercadomoya.Modelos.Articulo;
-import com.example.jorgebarraza.mercadomoya.Modelos.Usuario;
+import com.example.jorgebarraza.mercadomoya.Modelos.ArticuloPedido;
+import com.example.jorgebarraza.mercadomoya.Modelos.Pedido;
 import com.example.jorgebarraza.mercadomoya.R;
 import com.example.jorgebarraza.mercadomoya.Utils.Utilerias;
 import com.google.gson.Gson;
@@ -31,94 +32,63 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class RegistrarseActivity extends AppCompatActivity {
-    private EditText editNombre, editCorreo, editDireccion, editContra;
-    private Switch swAdmin;
-    private Button btnGuardar;
+public class DetallesPedidoActv extends AppCompatActivity {
+
+    private RecyclerView recyclerView;
+    private Button btnCancelarPedido;
     private Context context;
     private ProgressDialog progressDialog;
-    private String usuarioID = "";
-    private String correoID = "";
+    private Pedido pedidoRespuesta;
+    private String pedidoID;
+    private ArticulosPedidoAdapter articulosAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registrarse);
-        editContra = findViewById(R.id.edtContrasena);
-        editNombre = findViewById(R.id.edtNombre);
-        editDireccion = findViewById(R.id.edtDireccion);
-        editCorreo = findViewById(R.id.edtCorreo);
-        swAdmin = findViewById(R.id.swAdministrador);
-        btnGuardar = findViewById(R.id.btnRegistrarse);
-        context = RegistrarseActivity.this;
+        setContentView(R.layout.activity_detalles_pedido_actv);
+        btnCancelarPedido = findViewById(R.id.btnBorrarPedido);
+        recyclerView = findViewById(R.id.recyclerPedido);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        setTitle("Detalles del pedido");
+        context = DetallesPedidoActv.this;
+        Intent intent = getIntent();
+        pedidoID = intent.getStringExtra("pedidoID");
+        obtenerPedidoPorID();
 
-        btnGuardar.setOnClickListener(new View.OnClickListener() {
+        btnCancelarPedido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(editCorreo.getText().equals("") || editNombre.getText().equals("")){
-                    Utilerias.mostrarToast(context,"Ingrese nombre y correo para continuar");
-                }else{
-                    Usuario usuario = new Usuario();
-                    usuario.setNombre(editNombre.getText().toString());
-                    usuario.setDireccion(editDireccion.getText().toString());
-                    usuario.setContrasena(editContra.getText().toString());
-                    usuario.setCorreo(editCorreo.getText().toString());
-                    if(swAdmin.isChecked()){
-                        usuario.setRol(1);
-                    }else{
-                        usuario.setRol(0);
-                    }
-
-                    guardarUsuario(usuario);
-                }
+                borrarPedidoPorID();
             }
         });
-
-        setTitle("Pantalla de usuario");
-        Intent intent = getIntent();
-        usuarioID = intent.getStringExtra("usuarioID");
-        correoID = intent.getStringExtra("correo");
-        if(correoID != null){
-            obtenerUsuarioPorCorreo();
-        }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-    }
-
-    private void guardarUsuario(final Usuario usuario) {
+    private void borrarPedidoPorID() {
         try {
             progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Guardando datos...");
+            progressDialog.setMessage("Borrando datos...");
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.show();
             RequestQueue queue = Volley.newRequestQueue(this);
-            String url = Servicios.crearActualizarUsuario();
-            if (usuarioID != null) {
-                usuario.setUsuarioID(usuarioID);
-            }
-            String jsonArticulo = new Gson().toJson(usuario);
-            JSONObject jsonBody = new JSONObject(jsonArticulo);
+            String url = Servicios.borrarPedidoPorID();
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("PedidoID", pedidoID);
 
             JsonObjectRequest jsonOblect = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     if (response.length() > 0) {
-                        if(progressDialog != null){
+                        finish();
+                        if (progressDialog != null) {
                             progressDialog.dismiss();
                             progressDialog = null;
                         }
-                        Utilerias.mostrarToast(context,"Datos guardados correctamente!");
-                        finish();
                     } else {
                         Toast.makeText(context, "Datos no disponibles", Toast.LENGTH_LONG).show();
-                        if(progressDialog != null){
+                        if (progressDialog != null) {
                             progressDialog.dismiss();
                             progressDialog = null;
                         }
@@ -128,7 +98,7 @@ public class RegistrarseActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Utilerias.mostrarToast(context, "Error al procesar la peticion");
-                    if(progressDialog != null){
+                    if (progressDialog != null) {
                         progressDialog.dismiss();
                         progressDialog = null;
                     }
@@ -150,47 +120,40 @@ public class RegistrarseActivity extends AppCompatActivity {
             //VolleyApplication.getInstance().addToRequestQueue(jsonOblect);
         } catch (Exception ex) {
             Utilerias.mostrarToast(context, "Error al procesar la peticion");
-            if(progressDialog != null){
+            if (progressDialog != null) {
                 progressDialog.dismiss();
                 progressDialog = null;
             }
         }
     }
 
-    private void obtenerUsuarioPorCorreo() {
+    private void obtenerPedidoPorID() {
         try {
             progressDialog = new ProgressDialog(context);
             progressDialog.setMessage("Obteniendo datos...");
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.show();
             RequestQueue queue = Volley.newRequestQueue(this);
-            String url = Servicios.obtenerUsuarioPorCorreo();
+            String url = Servicios.obtenerPedidoPorID();
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("Correo", correoID);
+            jsonBody.put("pedidoID", pedidoID);
 
             JsonObjectRequest jsonOblect = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     if (response.length() > 0) {
-                        ArrayList<Articulo> listArticulos = new ArrayList<Articulo>();
                         Gson gson = new GsonBuilder().create();
-                        Usuario resp = gson.fromJson(String.valueOf(response), Usuario.class);
-                        editNombre.setText(resp.getNombre());
-                        editContra.setText(resp.getContrasena());
-                        editDireccion.setText(resp.getDireccion());
-                        editCorreo.setText(resp.getCorreo());
-                        if(resp.getRol() == 1){
-                            swAdmin.setChecked(true);
-                        }else{
-                            swAdmin.setChecked(false);
-                        }
-                        if(progressDialog != null){
+                        Pedido obj = gson.fromJson(String.valueOf(response), Pedido.class);
+                        pedidoRespuesta = obj;
+                        articulosAdapter = new ArticulosPedidoAdapter(pedidoRespuesta.getArticulos());
+                        recyclerView.setAdapter(articulosAdapter);
+                        if (progressDialog != null) {
                             progressDialog.dismiss();
                             progressDialog = null;
                         }
                     } else {
                         Toast.makeText(context, "Datos no disponibles", Toast.LENGTH_LONG).show();
-                        if(progressDialog != null){
+                        if (progressDialog != null) {
                             progressDialog.dismiss();
                             progressDialog = null;
                         }
@@ -200,7 +163,7 @@ public class RegistrarseActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Utilerias.mostrarToast(context, "Error al procesar la peticion");
-                    if(progressDialog != null){
+                    if (progressDialog != null) {
                         progressDialog.dismiss();
                         progressDialog = null;
                     }
@@ -222,7 +185,7 @@ public class RegistrarseActivity extends AppCompatActivity {
             //VolleyApplication.getInstance().addToRequestQueue(jsonOblect);
         } catch (Exception ex) {
             Utilerias.mostrarToast(context, "Error al procesar la peticion");
-            if(progressDialog != null){
+            if (progressDialog != null) {
                 progressDialog.dismiss();
                 progressDialog = null;
             }

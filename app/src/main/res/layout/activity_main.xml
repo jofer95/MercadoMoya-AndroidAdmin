@@ -23,7 +23,7 @@
                 android:layout_height="150dp"
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
-                app:srcCompat="@mipmap/ic_launcher" />
+                app:srcCompat="@drawable/mercado_moya" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -46,13 +46,14 @@
                     android:layout_marginLeft="15dp"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Usuario"
+                    android:hint="Usuario o correo"
                     android:inputType="textPersonName" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -95,12 +96,12 @@
 
             <Button
                 android:id="@+id/btnRegistrarse"
-
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_marginTop="30dp"
                 android:background="@drawable/btn_redondo_blanco"
-                android:text="Registrarse"
+                android:text="Registrar usuario"
                 android:textColor="@android:color/black"
                 android:textSize="15sp" />
 

@@ -1,15 +1,16 @@
 package com.example.jorgebarraza.mercadomoya.Activities;
 
 import android.app.ProgressDialog;
+import android.app.UiAutomation;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Switch;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -17,11 +18,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.jorgebarraza.mercadomoya.DB.Servicios;
 import com.example.jorgebarraza.mercadomoya.Modelos.Articulo;
-import com.example.jorgebarraza.mercadomoya.Modelos.Usuario;
+import com.example.jorgebarraza.mercadomoya.Modelos.Categoria;
 import com.example.jorgebarraza.mercadomoya.R;
 import com.example.jorgebarraza.mercadomoya.Utils.Utilerias;
 import com.google.gson.Gson;
@@ -32,79 +34,91 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 
-public class RegistrarseActivity extends AppCompatActivity {
-    private EditText editNombre, editCorreo, editDireccion, editContra;
-    private Switch swAdmin;
+public class AltaDeCategoria extends AppCompatActivity {
+
+    private EditText editNombre;
+    private EditText editImagen;
+    private ImageView imgImagen;
     private Button btnGuardar;
-    private Context context;
     private ProgressDialog progressDialog;
-    private String usuarioID = "";
-    private String correoID = "";
+    private Context context;
+    private String categoriaID;
+    private RequestQueue request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registrarse);
-        editContra = findViewById(R.id.edtContrasena);
-        editNombre = findViewById(R.id.edtNombre);
-        editDireccion = findViewById(R.id.edtDireccion);
-        editCorreo = findViewById(R.id.edtCorreo);
-        swAdmin = findViewById(R.id.swAdministrador);
-        btnGuardar = findViewById(R.id.btnRegistrarse);
-        context = RegistrarseActivity.this;
+        setContentView(R.layout.activity_alta_de_categoria);
+        editNombre = findViewById(R.id.edtNombreCategoria);
+        editImagen = findViewById(R.id.edtImagen);
+        imgImagen = findViewById(R.id.imgCategoria);
+        btnGuardar = findViewById(R.id.btnGuardarCategoria);
+        context = AltaDeCategoria.this;
+        Intent intent = getIntent();
+        categoriaID = intent.getStringExtra("categoriaID");
+
+        if(categoriaID != null){
+            obtenerArticuloPorID();
+        }
 
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(editCorreo.getText().equals("") || editNombre.getText().equals("")){
-                    Utilerias.mostrarToast(context,"Ingrese nombre y correo para continuar");
+                if(!editNombre.getText().equals("")){
+                    Categoria categoria = new Categoria();
+                    categoria.setNombre(editNombre.getText().toString());
+                    categoria.setImagenURL(editImagen.getText().toString());
+                    guardarCategoria(categoria);
                 }else{
-                    Usuario usuario = new Usuario();
-                    usuario.setNombre(editNombre.getText().toString());
-                    usuario.setDireccion(editDireccion.getText().toString());
-                    usuario.setContrasena(editContra.getText().toString());
-                    usuario.setCorreo(editCorreo.getText().toString());
-                    if(swAdmin.isChecked()){
-                        usuario.setRol(1);
-                    }else{
-                        usuario.setRol(0);
-                    }
-
-                    guardarUsuario(usuario);
+                    Utilerias.mostrarToast(context,"Ingrese los campos necesarios para continuar");
                 }
+
             }
         });
 
-        setTitle("Pantalla de usuario");
-        Intent intent = getIntent();
-        usuarioID = intent.getStringExtra("usuarioID");
-        correoID = intent.getStringExtra("correo");
-        if(correoID != null){
-            obtenerUsuarioPorCorreo();
-        }
+        editImagen.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+
+                if(!hasFocus){
+                    asignarFoto(editImagen.getText().toString());
+                }
+            }
+        });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
+    private void asignarFoto(String foto_url) {
+        request = Volley.newRequestQueue(context);
+        ImageRequest imageRequest = new ImageRequest(foto_url, new Response.Listener<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap response) {
+                imgImagen.setImageBitmap(response);
+            }
+        }, 0, 0, ImageView.ScaleType.CENTER, null, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(contexto, "Error al obtener fotografia", Toast.LENGTH_SHORT).show();
+            }
+        });
+        request.add(imageRequest);
     }
 
-    private void guardarUsuario(final Usuario usuario) {
+    private void guardarCategoria(final Categoria obj) {
         try {
             progressDialog = new ProgressDialog(context);
             progressDialog.setMessage("Guardando datos...");
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.show();
             RequestQueue queue = Volley.newRequestQueue(this);
-            String url = Servicios.crearActualizarUsuario();
-            if (usuarioID != null) {
-                usuario.setUsuarioID(usuarioID);
+            String url = Servicios.crearActualizarCategoria();
+            if (categoriaID != null) {
+                obj.setCategoriaID(categoriaID);
             }
-            String jsonArticulo = new Gson().toJson(usuario);
-            JSONObject jsonBody = new JSONObject(jsonArticulo);
+            String json = new Gson().toJson(obj);
+            JSONObject jsonBody = new JSONObject(json);
 
             JsonObjectRequest jsonOblect = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
@@ -114,7 +128,6 @@ public class RegistrarseActivity extends AppCompatActivity {
                             progressDialog.dismiss();
                             progressDialog = null;
                         }
-                        Utilerias.mostrarToast(context,"Datos guardados correctamente!");
                         finish();
                     } else {
                         Toast.makeText(context, "Datos no disponibles", Toast.LENGTH_LONG).show();
@@ -157,16 +170,16 @@ public class RegistrarseActivity extends AppCompatActivity {
         }
     }
 
-    private void obtenerUsuarioPorCorreo() {
+    private void obtenerArticuloPorID() {
         try {
             progressDialog = new ProgressDialog(context);
             progressDialog.setMessage("Obteniendo datos...");
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.show();
             RequestQueue queue = Volley.newRequestQueue(this);
-            String url = Servicios.obtenerUsuarioPorCorreo();
+            String url = Servicios.obtenerCategoriaPorID();
             JSONObject jsonBody = new JSONObject();
-            jsonBody.put("Correo", correoID);
+            jsonBody.put("CategoriaID", categoriaID);
 
             JsonObjectRequest jsonOblect = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
@@ -174,16 +187,10 @@ public class RegistrarseActivity extends AppCompatActivity {
                     if (response.length() > 0) {
                         ArrayList<Articulo> listArticulos = new ArrayList<Articulo>();
                         Gson gson = new GsonBuilder().create();
-                        Usuario resp = gson.fromJson(String.valueOf(response), Usuario.class);
-                        editNombre.setText(resp.getNombre());
-                        editContra.setText(resp.getContrasena());
-                        editDireccion.setText(resp.getDireccion());
-                        editCorreo.setText(resp.getCorreo());
-                        if(resp.getRol() == 1){
-                            swAdmin.setChecked(true);
-                        }else{
-                            swAdmin.setChecked(false);
-                        }
+                        Categoria obj = gson.fromJson(String.valueOf(response), Categoria.class);
+                        editNombre.setText(obj.getNombre());
+                        editImagen.setText(obj.getImagenURL());
+                        asignarFoto(obj.getImagenURL());
                         if(progressDialog != null){
                             progressDialog.dismiss();
                             progressDialog = null;
